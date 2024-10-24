@@ -11,13 +11,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalTime;
 import java.awt.event.KeyEvent;
+import java.io.PrintWriter;
 
 public class ExamController {
+	private PrintWriter out;
     private ExamClient examClient;
     private StudentExamView examView;
     private boolean isWindowActive = true;
 
     public ExamController() {
+    	
         examClient = new ExamClient();
         examView = new StudentExamView();
         startWindowMonitoring();
@@ -46,7 +49,7 @@ public class ExamController {
                 if (isWindowActive && !isActive) {
                     
                     System.out.println("Warning: Student switched to another window!");
-                    System.out.println("Warning: Student switched to another window at " + LocalTime.now());
+                    out.println("Warning: Student switched to another window at " + LocalTime.now());
                 }
                 isWindowActive = isActive;
             }
