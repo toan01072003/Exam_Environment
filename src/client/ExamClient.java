@@ -22,7 +22,7 @@ public class ExamClient {
     public void sendAnswer(int questionNumber, String answer) {
         LocalTime time = LocalTime.now();
         out.println("Answered question " + questionNumber + " at " + time + ": " + answer);
-        System.out.println("Logged answer for question " + questionNumber + " at " + time);
+        out.println("Logged answer for question " + questionNumber + " at " + time);
     }
 
     public void submitExam() {
