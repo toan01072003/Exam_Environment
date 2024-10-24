@@ -16,16 +16,16 @@ public class clientHandler implements Runnable {
     @Override
     public void run() {
         try (InputStream in = clientSocket.getInputStream()) {
-            // Nhận và lưu ảnh chụp màn hình từ máy khách
-            byte[] screenshotData = new byte[1024 * 1024]; // Buffer ảnh (1MB)
+        
+            byte[] screenshotData = new byte[1024 * 1024]; 
             int bytesRead;
             int count = 0;
 
             while ((bytesRead = in.read(screenshotData)) != -1) {
-                // Lưu ảnh chụp màn hình
+                
                 File screenshotFile = new File("screenshot_" + count++ + ".jpg");
                 
-                // Use FileOutputStream to write the data to the file
+               
                 try (FileOutputStream fos = new FileOutputStream(screenshotFile)) {
                     fos.write(screenshotData, 0, bytesRead);
                 }
