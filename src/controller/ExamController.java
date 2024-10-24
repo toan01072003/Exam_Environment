@@ -4,9 +4,13 @@ import client.ExamClient;
 import view.StudentExamView;
 
 import javax.swing.*;
+
+import java.awt.KeyEventDispatcher;
+import java.awt.KeyboardFocusManager;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalTime;
+import java.awt.event.KeyEvent;
 
 public class ExamController {
     private ExamClient examClient;
@@ -17,6 +21,7 @@ public class ExamController {
         examClient = new ExamClient();
         examView = new StudentExamView();
         startWindowMonitoring();
+        blockKeyboardShortcuts();
 
         
         examView.addSubmitListener(new ActionListener() {
@@ -47,6 +52,20 @@ public class ExamController {
             }
         });
         windowMonitor.start();
+    }
+    
+    private void blockKeyboardShortcuts() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                
+                if (e.isControlDown() && (e.getKeyCode() == KeyEvent.VK_C || e.getKeyCode() == KeyEvent.VK_V || e.getKeyCode() == KeyEvent.VK_X)) {
+                    System.out.println("Blocked key combination: " + KeyEvent.getKeyText(e.getKeyCode()));
+                    return true; 
+                }
+                return false; 
+            }
+        });
     }
 
     public static void main(String[] args) {
