@@ -1,5 +1,4 @@
 package client;
-
 import com.github.sarxos.webcam.Webcam;
 
 import javax.imageio.ImageIO;
@@ -107,4 +106,15 @@ public class ExamClient {
     }
 
     // Other methods remain unchanged...
+    public void sendAlert(String message) {
+        // Gửi thông báo âm thanh đến server
+    	try {
+        out.writeObject("Alert: " + message);
+        out.flush();
+        // Thêm mã gửi thông báo đến server nếu cần
+        // Ví dụ: socket.send(message);
+    } catch (IOException e) {
+        e.printStackTrace();
+    }
+    }
 }

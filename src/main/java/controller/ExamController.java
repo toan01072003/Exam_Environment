@@ -1,6 +1,7 @@
 package controller;
 
 import client.ExamClient;
+import client.NoiseDetection;
 import view.StudentExamView;
 
 import javax.swing.*;
@@ -13,6 +14,7 @@ public class ExamController {
     private ExamClient examClient;
     private StudentExamView examView;
     private boolean isWindowActive = true;
+    private NoiseDetection noiseDetection;
     public ExamController() {
         examClient = new ExamClient();
         examView = new StudentExamView();
@@ -40,6 +42,9 @@ public class ExamController {
             }
         });
 
+        // chay noise 
+        noiseDetection = new NoiseDetection(examClient);
+        new Thread(() -> noiseDetection.startListening()).start();
         // Chạy camera stream trên luồng riêng
         new Thread(() -> examClient.startCameraStream()).start();
     }
