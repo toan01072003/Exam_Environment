@@ -19,4 +19,5 @@ Tập trung vào việc phát triển hệ thống đảm bảo tính minh bạc
 
 3. **Camera Stream**: Server sẽ thấy được học sinh trong quá trình làm bài.
 
-4. **Noise Detection**: Hệ thống sẽ gửi thông báo và phát hiện nếu học sinh nói chuyện 
+4. **Noise Detection**: Hệ thống sẽ gửi thông báo và phát hiện nếu học sinh nói chuyện
+5. **Report Score**: Sau khi làm bài , server sẽ gửi điểm về cho học sinh. 
