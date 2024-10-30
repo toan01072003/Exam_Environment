@@ -6,7 +6,7 @@ Công cụ thiết lập, tạo môi trường thi online thông báo và phát 
 | MSV | Tên |
 |---|---|
 | B21DCVT229  | Nguyễn Đức Huy  |
-| B21DCVT713  | Hoàng Minh Toàn |
+| B21DCCN713  | Hoàng Minh Toàn |
 | B21DCVT288  | Hà Gia Minh  |
 
 ### Mô tả
