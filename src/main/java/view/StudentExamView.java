@@ -10,7 +10,7 @@ public class StudentExamView extends JPanel {
     private JButton submitButton;
 
     public StudentExamView() {
-        textArea = new JTextArea(20, 50);
+        textArea = new JTextArea(50, 50);
         submitButton = new JButton("Submit");
 
         setLayout(new BorderLayout());

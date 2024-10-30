@@ -36,8 +36,9 @@ public class ExamController {
                 for (int i = 0; i < answers.length; i++) {
                     examClient.sendAnswer(i + 1, answers[i]);
                 }
-                examClient.submitExam();
                 JOptionPane.showMessageDialog(null, "You have submitted your exam!");
+                examClient.submitExam();
+                
                 System.exit(0);
             }
         });

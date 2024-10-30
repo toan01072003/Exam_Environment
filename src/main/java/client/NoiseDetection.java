@@ -4,7 +4,7 @@ import javax.sound.sampled.*;
 
 public class NoiseDetection {
 
-    private static final float THRESHOLD = 0.1f; // Ngưỡng để phát hiện âm thanh mạnh
+    private static final float THRESHOLD = 0.2f; // Ngưỡng để phát hiện âm thanh mạnh
     private static final int BUFFER_SIZE = 1024; // Kích thước bộ đệm
     private ExamClient examClient; // Tham chiếu đến ExamClient để gửi thông báo
 

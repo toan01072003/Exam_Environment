@@ -2,18 +2,23 @@ package client;
 import com.github.sarxos.webcam.Webcam;
 
 import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.io.IOException;
+import java.io.ObjectInputStream;
 
 public class ExamClient {
     private Socket socketCamera;
     private Socket socket;
     private ObjectOutputStream out;
     private ObjectOutputStream outCamera ;
-    
+    private Socket gradingSocket;
+    private ObjectOutputStream gradingOut;
+    private ObjectInputStream gradingIn;
     public ExamClient() {
         try {
             // Kết nối tới server
@@ -21,6 +26,11 @@ public class ExamClient {
             socketCamera = new Socket("localhost", 8889);
             out = new ObjectOutputStream(socket.getOutputStream());
             outCamera = new ObjectOutputStream(socketCamera.getOutputStream());
+            
+            // ket noi cham diem 
+            gradingSocket = new Socket("localhost", 8890);
+            gradingOut = new ObjectOutputStream(gradingSocket.getOutputStream());
+            gradingIn = new ObjectInputStream(gradingSocket.getInputStream());
             // Khởi động stream camera
             startCameraStream();
         } catch (Exception e) {
@@ -73,6 +83,28 @@ public class ExamClient {
             e.printStackTrace();
         }
     }
+    
+    // cham diem 
+    public void submitExam() {
+        try {
+            out.writeObject("SUBMIT_EXAM");
+            out.flush();
+
+            
+           
+            // Gửi yêu cầu chấm điểm
+            gradingOut.writeObject("REQUEST_GRADING");
+            gradingOut.flush();
+
+            // Nhận kết quả từ server
+            String result = (String) gradingIn.readObject();
+            JOptionPane.showMessageDialog(null, result); // Hiển thị kết quả cho học sinh
+
+            gradingSocket.close();
+        } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
+        }
+    }
 
  // Send the window status to the server
     public void sendWindowStatus(boolean isActive) {
@@ -96,14 +128,7 @@ public class ExamClient {
         }
     }
     // Submit the exam
-    public void submitExam() {
-        try {
-            out.writeObject("SUBMIT_EXAM");
-            out.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+    
 
     // Other methods remain unchanged...
     public void sendAlert(String message) {
