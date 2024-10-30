@@ -13,6 +13,6 @@ Công cụ thiết lập, tạo môi trường thi online thông báo và phát 
 Tập trung vào việc phát triển hệ thống đảm bảo tính minh bạch và trung thực trong các kỳ thi trực tuyến. Hệ thống này sẽ tạo ra môi trường thi online với khả năng giám sát và phát hiện gian lận.
 
 ### Tính năng
-1. **Phát hiện hành động bất thường**: Theo dõi các sự kiện như: *mở tab mới, nhấp chuột trái, hoặc rời khỏi màn hình thi*. Những hành động này sẽ được ghi lại và gửi cảnh báo ngay lập tức cho giám thị.
+1. **Phát hiện hành động bất thường**: Theo dõi các sự kiện như: *mở tab mới,chặn quyền truy cập vào 1 số trang web copy/paste, hoặc rời khỏi màn hình thi*. Những hành động này sẽ được ghi lại và gửi cảnh báo ngay lập tức cho giám thị.
 
 2. **Thông báo tức thì**: Khi phát hiện vi phạm, hệ thống sẽ ngay lập tức gửi thông báo đến giám thị để xử lý kịp thời.
