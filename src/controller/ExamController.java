@@ -49,7 +49,7 @@ public class ExamController {
                 if (isWindowActive && !isActive) {
                     
                     System.out.println("Warning: Student switched to another window!");
-                    out.println("Warning: Student switched to another window at " + LocalTime.now());
+                    System.out.println("Warning: Student switched to another window at " + LocalTime.now());
                 }
                 isWindowActive = isActive;
             }
