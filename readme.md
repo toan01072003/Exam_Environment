@@ -18,3 +18,5 @@ Tập trung vào việc phát triển hệ thống đảm bảo tính minh bạc
 2. **Thông báo tức thì**: Khi phát hiện vi phạm, hệ thống sẽ ngay lập tức gửi thông báo đến giám thị để xử lý kịp thời.
 
 3. **Camera Stream**: Server sẽ thấy được học sinh trong quá trình làm bài.
+
+4. **Noise Detection**: Hệ thống sẽ gửi thông báo và phát hiện nếu học sinh nói chuyện 
