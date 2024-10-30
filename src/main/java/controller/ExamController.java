@@ -4,21 +4,29 @@ import client.ExamClient;
 import view.StudentExamView;
 
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.time.LocalTime;
+import java.awt.event.KeyEvent;
 
 public class ExamController {
     private ExamClient examClient;
     private StudentExamView examView;
     private boolean isWindowActive = true;
-
     public ExamController() {
         examClient = new ExamClient();
         examView = new StudentExamView();
-        startWindowMonitoring();
 
-        // Thêm action listener cho nút "Submit"
+        
+        JFrame frame = new JFrame("Exam Interface");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().add(examView); // Add the view to the frame
+        frame.pack();
+        frame.setVisible(true);
+
+        startWindowMonitoring();
+        blockKeyboardShortcuts();
+
         examView.addSubmitListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -31,22 +39,44 @@ public class ExamController {
                 System.exit(0);
             }
         });
+
+        // Chạy camera stream trên luồng riêng
+        new Thread(() -> examClient.startCameraStream()).start();
     }
-    
+
     private void startWindowMonitoring() {
-        Timer windowMonitor = new Timer(2000, new ActionListener() { // Check window state every 2 seconds
+        Timer windowMonitor = new Timer(2000, new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                boolean isActive = examView.isActive(); // Check if the exam window is active
+                boolean isActive = examView.isActive();
+                System.out.println("Window active status: " + isActive);
+                System.out.println("Previous window active status: " + isWindowActive);
+
                 if (isWindowActive && !isActive) {
-                    // If the window was active and suddenly is not -> possible student switched windows
-                    System.out.println("Warning: Student switched to another window!");
-                    System.out.println("Warning: Student switched to another window at " + LocalTime.now());
+                    examClient.sendWindowStatus(isActive); // Gửi thông báo đến server khi chuyển tab
+                    System.out.println("Window inactive, sent notification to server."); // Ghi log để kiểm tra
+                } else if (!isWindowActive && isActive) {
+                    examClient.sendWindowStatus(isActive); // Gửi thông báo khi quay lại cửa sổ
+                    System.out.println("Window active again, sent notification to server."); // Ghi log để kiểm tra
                 }
-                isWindowActive = isActive; // Update the window state
+                isWindowActive = isActive;
             }
         });
         windowMonitor.start();
+    }
+
+
+    private void blockKeyboardShortcuts() {
+        KeyboardFocusManager.getCurrentKeyboardFocusManager().addKeyEventDispatcher(new KeyEventDispatcher() {
+            @Override
+            public boolean dispatchKeyEvent(KeyEvent e) {
+                if (e.isControlDown() && (e.getKeyCode() == KeyEvent.VK_C || e.getKeyCode() == KeyEvent.VK_V || e.getKeyCode() == KeyEvent.VK_X)) {
+                    examClient.sendBlockedKeyCombination(KeyEvent.getKeyText(e.getKeyCode()));
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public static void main(String[] args) {

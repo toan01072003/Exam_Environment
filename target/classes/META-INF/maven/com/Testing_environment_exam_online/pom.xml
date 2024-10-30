@@ -21,5 +21,35 @@
       <version>3.8.1</version>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.github.sarxos</groupId>
+      <artifactId>webcam-capture</artifactId>
+      <version>0.3.12</version>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>8.0.33</version>
+    </dependency>
+    <dependency>
+    <groupId>net.java.dev.jna</groupId>
+    <artifactId>jna</artifactId>
+    <version>5.12.0</version>
+    </dependency>
+    <dependency>
+     <groupId>ch.qos.logback</groupId>
+     <artifactId>logback-classic</artifactId>
+     <version>1.2.3</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
+       <version>1.7.32</version>
+<!--  Check for the latest version  -->
+     </dependency><!-- Use the latest version -->
+
+
   </dependencies>
 </project>
