@@ -33,6 +33,8 @@ public class CameraHandler extends Thread {
                 ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
                 BufferedImage image = ImageIO.read(bais);
 
+                
+                
                 // Update the JLabel with the new image
                 label.setIcon(new ImageIcon(image));
                 label.repaint(); // Repaint the label to show the new image
@@ -47,4 +49,4 @@ public class CameraHandler extends Thread {
             }
         }
     }
-}
+}  

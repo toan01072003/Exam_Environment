@@ -50,6 +50,11 @@
 <!--  Check for the latest version  -->
      </dependency><!-- Use the latest version -->
 
+     <dependency>
+       <groupId>org.openpnp</groupId>
+       <artifactId>opencv</artifactId>
+       <version>4.5.1-2</version>
+     </dependency>
 
 
   </dependencies>
