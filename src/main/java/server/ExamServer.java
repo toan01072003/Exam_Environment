@@ -2,7 +2,7 @@ package server;
 
 import java.io.*;
 import java.net.*;
-
+ 
 public class ExamServer {
     private static final int PORT_TEXT = 8888; // For text messages
     private static final int PORT_CAMERA = 8889; // For camera data

@@ -13,6 +13,9 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
+  
+
+
 
   <dependencies>
     <dependency>
@@ -51,12 +54,13 @@
      </dependency><!-- Use the latest version -->
 
      <dependency>
-       <groupId>org.openpnp</groupId>
-       <artifactId>opencv</artifactId>
-       <version>4.5.1-2</version>
-     </dependency>
-     
+    <groupId>org.openpnp</groupId>
+    <artifactId>opencv</artifactId>
+    <version>4.9.0-0</version>
+</dependency>
 
+      
+    
 
   </dependencies>
 </project>

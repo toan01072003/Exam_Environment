@@ -5,7 +5,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.MatOfRect;
 import org.opencv.core.Rect;
 import org.opencv.core.Size;
-import org.opencv.imgcodecs.Imgcodecs;
 import org.opencv.imgproc.Imgproc;
 import org.opencv.objdetect.CascadeClassifier;
 
@@ -14,33 +13,63 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
+import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import javax.imageio.ImageIO;
 
 public class CameraHandler extends Thread {
     private Socket clientSocket;
-    private CascadeClassifier faceDetector;
-    private CascadeClassifier eyeDetector;
+    private PrintWriter out; // To send messages to the server
+    private List<CascadeClassifier> detectors; // For face detection
+    private List<CascadeClassifier> eyedetectors; // For eye detection
     private int missedFaceCount = 0;
-    private static final int MAX_MISSED_FACE_COUNT = 5; // Ngưỡng để phát hiện quay mặt đi
-    
+    private static final int MAX_MISSED_FACE_COUNT = 5;
+
     public CameraHandler(Socket socket) {
         this.clientSocket = socket;
-        
-        // Load thư viện OpenCV
+
+        // Load OpenCV library
         System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
-        
-        // Tải các mô hình phát hiện mặt và mắt
-        faceDetector = new CascadeClassifier("path/to/haarcascade_frontalface_alt.xml");
-        eyeDetector = new CascadeClassifier("path/to/haarcascade_eye.xml");
+
+        // Initialize detector lists
+        detectors = new ArrayList<>();
+        eyedetectors = new ArrayList<>();
+
+        // Load Haar Cascade models
+        String basePath = "C:\\Users\\Toan\\Downloads\\";
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_eye.xml"));
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_eye_tree_eyeglasses.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_default.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_alt.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_alt2.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_alt_tree.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_fullbody.xml"));
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_lefteye_2splits.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_lowerbody.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_profileface.xml"));
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_righteye_2splits.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_smile.xml"));
+        detectors.add(new CascadeClassifier(basePath + "haarcascade_upperbody.xml"));
+
+        try {
+            // Initialize PrintWriter to send messages to the server
+            OutputStream os = clientSocket.getOutputStream();
+            out = new PrintWriter(os, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public void run() {
+        // Setup GUI
         JFrame frame = new JFrame("Camera Stream");
         JLabel label = new JLabel();
         frame.add(label);
-        frame.setSize(640, 480); 
+        frame.setSize(640, 480);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
 
@@ -50,38 +79,42 @@ public class CameraHandler extends Thread {
                 ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
                 BufferedImage image = ImageIO.read(bais);
 
-                // Chuyển đổi BufferedImage thành Mat để xử lý bằng OpenCV
+                // Convert BufferedImage to Mat for OpenCV processing
                 Mat matImage = bufferedImageToMat(image);
 
-                // Phát hiện khuôn mặt
+                // Detect faces using multiple models
                 MatOfRect faces = new MatOfRect();
-                faceDetector.detectMultiScale(matImage, faces, 1.1, 3, 0, new Size(30, 30), new Size());
-                
+                detectObjects(matImage, faces);
+
+                // Check results of face detection
                 if (faces.toArray().length == 0) {
                     missedFaceCount++;
                     if (missedFaceCount >= MAX_MISSED_FACE_COUNT) {
-                        System.out.println("Cảnh báo: Sinh viên không ở trong tầm nhìn camera!");
-                        JOptionPane.showMessageDialog(null, "Sinh viên không ở trong tầm nhìn camera!");
-                        missedFaceCount = 0; // Đặt lại bộ đếm sau cảnh báo
+                        System.out.println("Warning: Student is not in camera view!");
+                        missedFaceCount = 0; // Reset counter after warning
                     }
                 } else {
-                    // Reset missed face count nếu phát hiện khuôn mặt
+                    // Reset missed face count if a face is detected
                     missedFaceCount = 0;
 
-                    // Kiểm tra hướng mặt qua phát hiện mắt
+                    // Check face direction by detecting eyes
                     for (Rect face : faces.toArray()) {
-                        Mat faceROI = matImage.submat(face); // Vùng khuôn mặt phát hiện được
+                        Mat faceROI = matImage.submat(face);
                         MatOfRect eyes = new MatOfRect();
-                        eyeDetector.detectMultiScale(faceROI, eyes);
+                        detectEyes(faceROI, eyes); // Use the new method for eye detection
 
-                        if (eyes.toArray().length < 2) {
-                            System.out.println("Cảnh báo: Sinh viên có thể đang quay mặt!");
-                            JOptionPane.showMessageDialog(null, "Sinh viên có thể đang quay mặt!");
-                        }
+//                        if (eyes.toArray().length < 2) { // If less than two eyes are detected
+//                            if (eyes.toArray().length == 1) {
+//                                System.out.println("Warning: Student may be looking away or wearing glasses!");
+//                            } else {
+//                                System.out.println("Warning: No eyes detected! Student may be looking away or is not in view!");
+//                            }
+//                        }
+
                     }
                 }
 
-                // Cập nhật hình ảnh vào JLabel
+                // Update image in JLabel
                 label.setIcon(new ImageIcon(image));
                 label.repaint();
             }
@@ -96,11 +129,33 @@ public class CameraHandler extends Thread {
         }
     }
 
-    // Hàm chuyển đổi BufferedImage thành Mat
+    // Function to detect faces and other objects using multiple models
+    private void detectObjects(Mat matImage, MatOfRect faces) {
+        for (CascadeClassifier detector : detectors) {
+            detector.detectMultiScale(matImage, faces, 1.1, 5, 0, new Size(30, 30), new Size());
+
+            if (faces.toArray().length > 0) {
+                break; // Stop searching if faces are detected
+            }
+        }
+    } 
+
+    // Function to detect eyes using the list of eye detectors
+    private void detectEyes(Mat faceROI, MatOfRect eyes) {
+        for (CascadeClassifier eyeDetector : eyedetectors) {
+            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 5, 0, new Size(30, 30), new Size());
+
+            if (eyes.toArray().length > 0) {
+                break; // Stop searching if eyes are detected
+            }
+        }
+    }
+
+    // Convert BufferedImage to Mat
     private Mat bufferedImageToMat(BufferedImage bi) {
         Mat mat = new Mat(bi.getHeight(), bi.getWidth(), org.opencv.core.CvType.CV_8UC3);
         byte[] data = ((java.awt.image.DataBufferByte) bi.getRaster().getDataBuffer()).getData();
         mat.put(0, 0, data);
         return mat;
     }
-}
+}  

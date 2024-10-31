@@ -26,7 +26,7 @@ public class ExamController {
 	private StudentExamView examView;
 	private boolean isWindowActive = true;
 	private NoiseDetection noiseDetection;
-	private static final String[] BLOCKED_APPS = { "firefox.exe", "chrome.exe", "msedge.exe" };
+	private static final String[] BLOCKED_APPS = { "firefox.exe", "chrome.exe" };
 	private static final long CHECK_INTERVAL = 1000; // 5 giây
 	public Boolean check;
 
@@ -76,7 +76,7 @@ public class ExamController {
 			}
 		}, 0, CHECK_INTERVAL, TimeUnit.MILLISECONDS);
 	}
-
+ 
 	private void checkAndBlockApps() {
 		try {
 			Process process = Runtime.getRuntime().exec("tasklist");
