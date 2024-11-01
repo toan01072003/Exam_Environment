@@ -132,7 +132,7 @@ public class CameraHandler extends Thread {
     // Function to detect faces and other objects using multiple models
     private void detectObjects(Mat matImage, MatOfRect faces) {
         for (CascadeClassifier detector : detectors) {
-            detector.detectMultiScale(matImage, faces, 1.1, 5, 0, new Size(30, 30), new Size());
+            detector.detectMultiScale(matImage, faces, 1.1, 3, 0, new Size(30, 30), new Size());
 
             if (faces.toArray().length > 0) {
                 break; // Stop searching if faces are detected
