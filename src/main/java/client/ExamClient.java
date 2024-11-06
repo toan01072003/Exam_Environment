@@ -64,7 +64,7 @@ public class ExamClient {
                         outCamera.flush();
 
                         // Tạm dừng để giảm băng thông
-                        Thread.sleep(100); // Gửi 10 khung hình mỗi giây
+                        Thread.sleep(200); // Gửi 10 khung hình mỗi giây
                     } else {
                         System.err.println("Failed to capture image from webcam.");
                     }

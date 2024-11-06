@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
 
+
 public class CameraHandler extends Thread {
     private Socket clientSocket;
     private PrintWriter out; // To send messages to the server
@@ -102,23 +103,15 @@ public class CameraHandler extends Thread {
                         Mat faceROI = matImage.submat(face);
                         MatOfRect eyes = new MatOfRect();
                         detectEyes(faceROI, eyes); // Use the new method for eye detection
-
-//                        if (eyes.toArray().length < 2) { // If less than two eyes are detected
-//                            if (eyes.toArray().length == 1) {
-//                                System.out.println("Warning: Student may be looking away or wearing glasses!");
-//                            } else {
-//                                System.out.println("Warning: No eyes detected! Student may be looking away or is not in view!");
-//                            }
-//                        }
 //
-                    }
-                }
+                   }
+              }
 
                 // Update image in JLabel
                 label.setIcon(new ImageIcon(image));
                 label.repaint();
             }
-        } catch (Exception e) {
+            } catch (Exception e) {
             e.printStackTrace();
         } finally {
             try {
@@ -132,7 +125,7 @@ public class CameraHandler extends Thread {
     // Function to detect faces and other objects using multiple models
     private void detectObjects(Mat matImage, MatOfRect faces) {
         for (CascadeClassifier detector : detectors) {
-            detector.detectMultiScale(matImage, faces, 1.1, 3, 0, new Size(10, 10), new Size());
+            detector.detectMultiScale(matImage, faces, 1.1, 4, 0, new Size(40, 40), new Size());
 
             if (faces.toArray().length > 0) {
                 break; // Stop searching if faces are detected
@@ -143,7 +136,7 @@ public class CameraHandler extends Thread {
     // Function to detect eyes using the list of eye detectors
     private void detectEyes(Mat faceROI, MatOfRect eyes) {
         for (CascadeClassifier eyeDetector : eyedetectors) {
-            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 5, 0, new Size(30, 30), new Size());
+            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 5, 0, new Size(40, 40), new Size());
 
             if (eyes.toArray().length > 0) {
                 break; // Stop searching if eyes are detected
