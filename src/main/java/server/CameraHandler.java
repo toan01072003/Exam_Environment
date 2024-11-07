@@ -41,20 +41,24 @@ public class CameraHandler extends Thread {
 
         // Load Haar Cascade models
         String basePath = "C:\\Users\\Toan\\Downloads\\";
-        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_eye.xml"));
-        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_eye_tree_eyeglasses.xml"));
+      
         detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_default.xml"));
         detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_alt.xml"));
         detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_alt2.xml"));
         detectors.add(new CascadeClassifier(basePath + "haarcascade_frontalface_alt_tree.xml"));
         detectors.add(new CascadeClassifier(basePath + "haarcascade_fullbody.xml"));
-        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_lefteye_2splits.xml"));
+        
         detectors.add(new CascadeClassifier(basePath + "haarcascade_lowerbody.xml"));
         detectors.add(new CascadeClassifier(basePath + "haarcascade_profileface.xml"));
-        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_righteye_2splits.xml"));
+        
         detectors.add(new CascadeClassifier(basePath + "haarcascade_smile.xml"));
         detectors.add(new CascadeClassifier(basePath + "haarcascade_upperbody.xml"));
 
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_righteye_2splits.xml"));
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_lefteye_2splits.xml"));
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_eye.xml"));
+        eyedetectors.add(new CascadeClassifier(basePath + "haarcascade_eye_tree_eyeglasses.xml"));
+        
         try {
             // Initialize PrintWriter to send messages to the server
             OutputStream os = clientSocket.getOutputStream();
@@ -99,12 +103,22 @@ public class CameraHandler extends Thread {
                     missedFaceCount = 0;
 
                     // Check face direction by detecting eyes
+                 // Kiểm tra hướng mặt của học sinh bằng cách phát hiện mắt
                     for (Rect face : faces.toArray()) {
                         Mat faceROI = matImage.submat(face);
                         MatOfRect eyes = new MatOfRect();
-                        detectEyes(faceROI, eyes); // Use the new method for eye detection
-//
-                   }
+                        detectEyes(faceROI, eyes); // Gọi hàm phát hiện mắt
+
+                        int eyeCount = eyes.toArray().length;
+
+                        // Kiểm tra số lượng mắt được phát hiện
+                        if (eyeCount == 2) {
+                            System.out.println("Học sinh đang nhìn thẳng vào camera.");
+                        } else if (eyeCount == 1) {
+                            System.out.println("Học sinh có thể đang quay mặt sang một bên.");
+                        } 
+                    }
+
               }
 
                 // Update image in JLabel
@@ -136,13 +150,15 @@ public class CameraHandler extends Thread {
     // Function to detect eyes using the list of eye detectors
     private void detectEyes(Mat faceROI, MatOfRect eyes) {
         for (CascadeClassifier eyeDetector : eyedetectors) {
-            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 5, 0, new Size(40, 40), new Size());
+            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 4, 0, new Size(40, 40), new Size());
 
             if (eyes.toArray().length > 0) {
                 break; // Stop searching if eyes are detected
             }
         }
     }
+    
+    
 
     // Convert BufferedImage to Mat
     private Mat bufferedImageToMat(BufferedImage bi) {
