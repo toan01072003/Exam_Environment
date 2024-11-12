@@ -18,7 +18,7 @@ import javax.swing.SwingUtilities;
 import javax.swing.Timer;
 
 import client.ExamClient;
-import client.NoiseDetection;
+import server.NoiseDetection;
 import view.StudentExamView;
 
 public class ExamController {

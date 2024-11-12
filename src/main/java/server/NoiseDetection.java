@@ -1,6 +1,8 @@
-package client;
+package server;
 
 import javax.sound.sampled.*;
+
+import client.ExamClient;
 
 public class NoiseDetection {
 

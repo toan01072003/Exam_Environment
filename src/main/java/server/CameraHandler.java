@@ -139,7 +139,7 @@ public class CameraHandler extends Thread {
     // Function to detect faces and other objects using multiple models
     private void detectObjects(Mat matImage, MatOfRect faces) {
         for (CascadeClassifier detector : detectors) {
-            detector.detectMultiScale(matImage, faces, 1.1, 4, 0, new Size(40, 40), new Size());
+            detector.detectMultiScale(matImage, faces, 1.1, 3, 0, new Size(40, 40), new Size());
 
             if (faces.toArray().length > 0) {
                 break; // Stop searching if faces are detected
@@ -150,7 +150,7 @@ public class CameraHandler extends Thread {
     // Function to detect eyes using the list of eye detectors
     private void detectEyes(Mat faceROI, MatOfRect eyes) {
         for (CascadeClassifier eyeDetector : eyedetectors) {
-            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 4, 0, new Size(40, 40), new Size());
+            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 3, 0, new Size(40, 40), new Size());
 
             if (eyes.toArray().length > 0) {
                 break; // Stop searching if eyes are detected
