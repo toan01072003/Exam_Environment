@@ -21,4 +21,4 @@ Tập trung vào việc phát triển hệ thống đảm bảo tính minh bạc
 
 ### Công cụ 
 1. **OpenCV** sử dụng các mô hình phân biện và phát hiện khuôn mặt, cơ thể của OpenCV như Haarcascade, FaceNet, LBPH,..
-2. **Python và Visual Studio Code" sử dụng để tạo môi trường nhằm xác thực một cách chính xác 
+2. **Python và Visual Studio Code*** sử dụng để tạo môi trường nhằm xác thực một cách chính xác 
