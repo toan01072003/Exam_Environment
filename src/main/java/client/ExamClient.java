@@ -23,6 +23,7 @@ public class ExamClient {
     private Socket gradingSocket;
     private ObjectOutputStream gradingOut;
     private ObjectInputStream gradingIn;
+    private ObjectOutputStream outFace;
     public ExamClient() {
         try { 
             // Kết nối tới server
@@ -31,12 +32,17 @@ public class ExamClient {
             out = new ObjectOutputStream(socket.getOutputStream());
             outCamera = new ObjectOutputStream(socketCamera.getOutputStream());
             
+            // face 
+            Socket faceSocket = new Socket("localhost", 6000);
+            outFace = new ObjectOutputStream(faceSocket.getOutputStream());
+            
             // ket noi cham diem 
             gradingSocket = new Socket("localhost", 8890);
             gradingOut = new ObjectOutputStream(gradingSocket.getOutputStream());
             gradingIn = new ObjectInputStream(gradingSocket.getInputStream());
             // Khởi động stream camera
             startCameraStream();
+            startCameraStreamFace();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -46,22 +52,55 @@ public class ExamClient {
     public void startCameraStream() {
         new Thread(() -> {
             try {
-                Webcam webcam = Webcam.getDefault();
-                if (webcam == null) {
-                    System.err.println("No webcam detected.");
+                Webcam webcamCamera = Webcam.getDefault(); // Tạo webcam riêng cho camera
+                if (webcamCamera == null) {
+                    System.err.println("No webcam detected for camera.");
                     return; // Thoát nếu không có webcam
                 }
-                webcam.open();
+                webcamCamera.open();
 
                 // Gửi ảnh webcam liên tục
                 while (true) {
-                    BufferedImage image = webcam.getImage();
+                    BufferedImage image = webcamCamera.getImage();
                     if (image != null) {
-                        byte[] imageBytes = convertImageToByteArray(image, 0.9f); // Set quality to 90%
-                        
+                        byte[] imageBytes = convertImageToByteArray(image, 1.0f); // Set quality to 90%
+
                         // Gửi dữ liệu ảnh tới server
                         outCamera.writeObject(imageBytes);
                         outCamera.flush();
+
+                        // Tạm dừng để giảm băng thông
+                        Thread.sleep(200); // Gửi 10 khung hình mỗi giây
+                    } else {
+                        System.err.println("Failed to capture image from webcam.");
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
+    }
+
+    // Bắt đầu stream camera cho face
+    public void startCameraStreamFace() {
+        new Thread(() -> {
+            try {
+                Webcam webcamFace = Webcam.getDefault(); // Tạo webcam riêng cho face
+                if (webcamFace == null) {
+                    System.err.println("No webcam detected for face.");
+                    return; // Thoát nếu không có webcam
+                }
+                webcamFace.open();
+
+                // Gửi ảnh webcam liên tục cho face
+                while (true) {
+                    BufferedImage image = webcamFace.getImage();
+                    if (image != null) {
+                        byte[] imageBytes = convertImageToByteArray(image, 1.0f); // Set quality to 90%
+
+                        // Gửi dữ liệu ảnh cho face server
+                        outFace.writeObject(imageBytes);
+                        outFace.flush();
 
                         // Tạm dừng để giảm băng thông
                         Thread.sleep(200); // Gửi 10 khung hình mỗi giây

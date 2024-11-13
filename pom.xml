@@ -60,11 +60,13 @@
 <!--  Check for the latest version  -->
      </dependency><!-- Use the latest version -->
 
-     <dependency>
+   <dependency>
     <groupId>org.openpnp</groupId>
     <artifactId>opencv</artifactId>
     <version>4.9.0-0</version>
 </dependency>
+
+
   
 
    <dependency>
@@ -72,6 +74,8 @@
     <artifactId>javacv-platform</artifactId>
     <version>1.5.7</version>
 </dependency>
+
+
 
 
 

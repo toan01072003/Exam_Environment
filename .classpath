@@ -44,12 +44,8 @@
 			<attribute name="m2e-apt" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="C:/Users/Toan/Downloads/opencv/build/java/opencv-490.jar">
-		<attributes>
-			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="C:/Users/Toan/Downloads/opencv/build/java/x64"/>
-		</attributes>
-	</classpathentry>
 	<classpathentry kind="lib" path="C:/Users/Toan/Downloads/TarsosDSP-2.4.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Toan/Downloads/opencv/build/java/opencv-490.jar"/>
 	<classpathentry kind="src" output="target/test-classes" path="target/generated-test-sources/test-annotations">
 		<attributes>
 			<attribute name="optional" value="true"/>

@@ -11,6 +11,7 @@ import org.opencv.objdetect.CascadeClassifier;
 import javax.swing.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
@@ -19,7 +20,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import javax.imageio.ImageIO;
-
+import java.io.DataOutputStream;
 
 public class CameraHandler extends Thread {
     private Socket clientSocket;
@@ -28,13 +29,18 @@ public class CameraHandler extends Thread {
     private List<CascadeClassifier> eyedetectors; // For eye detection
     private int missedFaceCount = 0;
     private static final int MAX_MISSED_FACE_COUNT = 5;
-
+   
+    private Socket pythonSocket;
+    private DataOutputStream dataOutputStream;
+    
+    
     public CameraHandler(Socket socket) {
         this.clientSocket = socket;
 
         // Load OpenCV library
-        System.loadLibrary(Core.NATIVE_LIBRARY_NAME);
+        System.load("C:\\Users\\Toan\\Downloads\\opencv\\build\\java\\x64\\opencv_java490.dll");
 
+       
         // Initialize detector lists
         detectors = new ArrayList<>();
         eyedetectors = new ArrayList<>();
@@ -63,6 +69,8 @@ public class CameraHandler extends Thread {
             // Initialize PrintWriter to send messages to the server
             OutputStream os = clientSocket.getOutputStream();
             out = new PrintWriter(os, true);
+            
+           
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -70,7 +78,6 @@ public class CameraHandler extends Thread {
 
     @Override
     public void run() {
-        // Setup GUI
         JFrame frame = new JFrame("Camera Stream");
         JLabel label = new JLabel();
         frame.add(label);
@@ -80,66 +87,58 @@ public class CameraHandler extends Thread {
 
         try (ObjectInputStream in = new ObjectInputStream(clientSocket.getInputStream())) {
             while (true) {
-                byte[] imageBytes = (byte[]) in.readObject();
-                ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
-                BufferedImage image = ImageIO.read(bais);
+                try {
+                    byte[] imageBytes = (byte[]) in.readObject();
+                    if (imageBytes == null || imageBytes.length == 0) continue;
+                    
+                    ByteArrayInputStream bais = new ByteArrayInputStream(imageBytes);
+                    BufferedImage image = ImageIO.read(bais);
 
-                // Convert BufferedImage to Mat for OpenCV processing
-                Mat matImage = bufferedImageToMat(image);
+                    if (image == null) continue; // Skip processing if image is invalid
+                    Mat matImage = bufferedImageToMat(image);
+                    MatOfRect faces = new MatOfRect();
+                    detectObjects(matImage, faces);
 
-                // Detect faces using multiple models
-                MatOfRect faces = new MatOfRect();
-                detectObjects(matImage, faces);
+                    if (faces.toArray().length == 0) {
+                        missedFaceCount++;
+                        if (missedFaceCount >= MAX_MISSED_FACE_COUNT) {
+                            System.out.println("Warning: Student is not in camera view!");
+                            missedFaceCount = 0;
+                        }
+                    } else {
+                        missedFaceCount = 0;
+                        for (Rect face : faces.toArray()) {
+                            Mat faceROI = matImage.submat(face);
+                            MatOfRect eyes = new MatOfRect();
+                            detectEyes(faceROI, eyes);
 
-                // Check results of face detection
-                if (faces.toArray().length == 0) {
-                    missedFaceCount++;
-                    if (missedFaceCount >= MAX_MISSED_FACE_COUNT) {
-                        System.out.println("Warning: Student is not in camera view!");
-                        missedFaceCount = 0; // Reset counter after warning
+                            int eyeCount = eyes.toArray().length;
+                            if (eyeCount == 2) {
+                                System.out.println("Student is looking straight at the camera.");
+                            } else if (eyeCount == 1) {
+                                System.out.println("Student may be looking to the side.");
+                            }
+                        }
                     }
-                } else {
-                    // Reset missed face count if a face is detected
-                    missedFaceCount = 0;
+                    
+                    label.setIcon(new ImageIcon(image));
+                    label.repaint();
 
-                    // Check face direction by detecting eyes
-                 // Kiểm tra hướng mặt của học sinh bằng cách phát hiện mắt
-                    for (Rect face : faces.toArray()) {
-                        Mat faceROI = matImage.submat(face);
-                        MatOfRect eyes = new MatOfRect();
-                        detectEyes(faceROI, eyes); // Gọi hàm phát hiện mắt
-
-                        int eyeCount = eyes.toArray().length;
-
-                        // Kiểm tra số lượng mắt được phát hiện
-                        if (eyeCount == 2) {
-                            System.out.println("Học sinh đang nhìn thẳng vào camera.");
-                        } else if (eyeCount == 1) {
-                            System.out.println("Học sinh có thể đang quay mặt sang một bên.");
-                        } 
-                    }
-
-              }
-
-                // Update image in JLabel
-                label.setIcon(new ImageIcon(image));
-                label.repaint();
+                } catch (ClassNotFoundException | IOException e) {
+                    e.printStackTrace();
+                    break; // Exit the loop on error
+                }
             }
-            } catch (Exception e) {
+        } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            try {
-                clientSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+        } 
     }
+
 
     // Function to detect faces and other objects using multiple models
     private void detectObjects(Mat matImage, MatOfRect faces) {
         for (CascadeClassifier detector : detectors) {
-            detector.detectMultiScale(matImage, faces, 1.1, 3, 0, new Size(40, 40), new Size());
+            detector.detectMultiScale(matImage, faces, 1.1, 4, 0, new Size(30, 30), new Size());
 
             if (faces.toArray().length > 0) {
                 break; // Stop searching if faces are detected
@@ -150,7 +149,7 @@ public class CameraHandler extends Thread {
     // Function to detect eyes using the list of eye detectors
     private void detectEyes(Mat faceROI, MatOfRect eyes) {
         for (CascadeClassifier eyeDetector : eyedetectors) {
-            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 3, 0, new Size(40, 40), new Size());
+            eyeDetector.detectMultiScale(faceROI, eyes, 1.1, 4, 0, new Size(30, 30), new Size());
 
             if (eyes.toArray().length > 0) {
                 break; // Stop searching if eyes are detected
@@ -165,6 +164,11 @@ public class CameraHandler extends Thread {
         Mat mat = new Mat(bi.getHeight(), bi.getWidth(), org.opencv.core.CvType.CV_8UC3);
         byte[] data = ((java.awt.image.DataBufferByte) bi.getRaster().getDataBuffer()).getData();
         mat.put(0, 0, data);
+        Imgproc.cvtColor(mat, mat, Imgproc.COLOR_RGB2BGR); // Convert from RGB to BGR format
         return mat;
     }
+
+    
+    
+
 }  

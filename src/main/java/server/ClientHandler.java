@@ -5,6 +5,7 @@ import java.net.*;
 
 public class ClientHandler extends Thread {
     private Socket clientSocket;
+    private static final long serialVersionUID = 1L;
 
     public ClientHandler(Socket clientSocket) {
         this.clientSocket = clientSocket;
