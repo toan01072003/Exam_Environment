@@ -2,13 +2,6 @@
 ### Chủ đề
 Công cụ thiết lập, tạo môi trường thi online xác minh danh tính thí sinh, theo dõi hành vi của thí sinh thông qua camera.
 
-### Thành viên
-| MSV | Tên |
-|---|---|
-| B21DCVT229  | Nguyễn Đức Huy  |
-| B21DCCN713  | Hoàng Minh Toàn |
-| B21DCVT288  | Hà Gia Minh     |
-
 ### Mô tả
 Tập trung vào việc phát triển hệ thống đảm bảo tính minh bạch và trung thực trong các kỳ thi trực tuyến. Hệ thống này sẽ tạo ra môi trường thi online với khả năng giám sát và phát hiện gian lận.
 
